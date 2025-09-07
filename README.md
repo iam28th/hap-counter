@@ -13,6 +13,8 @@ cd hap-counter
 python hap-counter.py --help
 ```
 
+The only dependency is pysam.
+
 # Usage
 
 ```bash
