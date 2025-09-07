@@ -6,7 +6,7 @@ def parse_args() -> argparse.Namespace:
         prog="hap-counter",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         allow_abbrev=False,
-        description="Computes support for ALT and REF alleles from alignment",
+        description="Computes support for ALT and REF alleles from aligned reads",
         epilog="To report issues: https://github.com/iam28th/hap-counter",
     )
 
@@ -22,21 +22,21 @@ def parse_args() -> argparse.Namespace:
         "--bam",
         type=argparse.FileType("r"),
         # TODO: check that corresponding .bai is present in action kwarg
-        help="A file with aligned reads which must be indexed beforhand. The reads are assumed sorted by coordinate.",
+        help="a file with aligned reads which must be indexed beforehand; the reads are assumed sorted by coordinate",
         required=True,
     )
 
     parser.add_argument(
         "--vcf",
         type=argparse.FileType("r"),
-        help="Variants in phased VCF format (optionally gzipped). For now only SNVs are processed",
+        help="variants in phased VCF format, optionally gzipped; for now only SNVs are processed",
         required=True,
     )
 
     parser.add_argument(
         "--output",
         type=argparse.FileType("w"),
-        help="Output path (when omitted, is generated from timestamp).",
+        help="output path; when omitted, is generated from PID and timestamp",
     )
 
     return parser.parse_args()

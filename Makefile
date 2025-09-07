@@ -8,6 +8,9 @@ OUT := output.tsv
 test:
 	python hap-counter.py --bam $(BAM) --vcf $(VCF) --output $(OUT)
 
-.PHONY: clean
+.PHONY: clean cleanall
 clean:
 	rm -f $(OUT)
+
+cleanall: clean
+	rm -f *.tsv
