@@ -6,14 +6,14 @@ Given read alignments (in BAM format with haplotype tags) and a set of variants 
 
 ```bash
 git clone git@github.com:iam28th/hap-counter.git --recurse-submodules
-# submodules contain specification and test files, omit 
-# if they are not necessary
+# submodules contain specification and test files, 
+# omit if they are not necessary
 
 cd hap-counter
 python hap-counter.py --help
 ```
 
-The only dependency is pysam.
+The only dependency is pysam, which can be installed with pip.
 
 # Usage
 
