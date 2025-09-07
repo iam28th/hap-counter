@@ -6,6 +6,7 @@ import pysam
 import src.pysam_utils as pysam_utils
 import src.results_writer as results_writer
 import src.utils as utils
+from src.logger import logger
 from src.output_utils import get_default_output_path
 from src.types import SNV_Support
 
@@ -17,6 +18,8 @@ def run(args: argparse.Namespace):
         output_file = get_default_output_path()
     else:
         output_file = output_file.name
+
+    processed_variants = 0
 
     # assume both files to be sorted by coordinate
     # and grouped by chromosome
@@ -70,7 +73,10 @@ def run(args: argparse.Namespace):
 
             row = get_variant_support(variant, overlapping_reads)
             writer.writerow(dataclasses.asdict(row))
-            csvfile.flush()
+
+            processed_variants += 1
+            if processed_variants % 10 == 0:
+                logger.info(f"Processed {processed_variants} SNVs...")
 
 
 def get_variant_support(variant, reads) -> SNV_Support:
