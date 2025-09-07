@@ -8,7 +8,7 @@ import src.results_writer as results_writer
 import src.utils as utils
 from src.logger import logger
 from src.output_utils import get_default_output_path
-from src.types import SNV_Support
+from src.types import ReadStruct, SNV_Support
 
 
 def run(args: argparse.Namespace):
@@ -56,7 +56,7 @@ def run(args: argparse.Namespace):
 
             else:
                 overlapping_reads = [
-                    r for r in overlapping_reads if r.reference_end > variant.start
+                    r for r in overlapping_reads if r.read.reference_end > variant.start
                 ]
 
             # load all reads that (might) cover this variant
@@ -68,39 +68,43 @@ def run(args: argparse.Namespace):
                     and next_read.has_tag("HP")
                     and next_read.reference_end > variant.start
                 ):
-                    overlapping_reads.append(next_read)
+                    rs = ReadStruct()
+                    rs.read = next_read
+                    overlapping_reads.append(rs)
+
                 next_read = utils.next_or_none(reads_iterator)
 
             row = get_variant_support(variant, overlapping_reads)
             writer.writerow(dataclasses.asdict(row))
 
             processed_variants += 1
-            if processed_variants % 10 == 0:
+            if processed_variants % 50 == 0:
                 logger.info(f"Processed {processed_variants} SNVs...")
 
 
-def get_variant_support(variant, reads) -> SNV_Support:
+def get_variant_support(variant, reads: list[ReadStruct]) -> SNV_Support:
     vs = SNV_Support(chrom=variant.chrom, pos=variant.start)
 
     # convert everything to upper case (just in case)
     ref_base = variant.ref.upper()
     alt_base = variant.alts[0][0].upper()
 
-    for read in reads:
-        aligned_pairs = read.get_aligned_pairs(matches_only=True)
+    for rs in reads:
+        if rs.aligned_pairs is None:
+            rs.aligned_pairs = rs.read.get_aligned_pairs(matches_only=True)
 
         read_base = None
 
         # search for a pair where reference position matches
         # with the position of the variant
-        for read_offset, ref_offset in aligned_pairs:
+        for read_offset, ref_offset in rs.aligned_pairs:
             if ref_offset == variant.start:
-                read_base = read.query_sequence[read_offset].upper()
+                read_base = rs.read.query_sequence[read_offset].upper()
                 break
 
         if read_base:
-            assert read.has_tag("HP")
-            if read.get_tag("HP") == 1:
+            assert rs.read.has_tag("HP")
+            if rs.read.get_tag("HP") == 1:
                 vs.h1_REF += read_base == ref_base
                 vs.h1_ALT += read_base == alt_base
             else:

@@ -2,6 +2,17 @@ from src.compat import dataclass
 
 
 @dataclass(slots=True)
+class ReadStruct:
+    """
+    Used to cache results of expensive calls,
+    such as  read.get_aligned_pairs
+    """
+
+    read = None
+    aligned_pairs = None
+
+
+@dataclass(slots=True)
 class SNV_Support:
     """
     Represents one row of the output
