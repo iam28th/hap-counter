@@ -34,6 +34,13 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "--chrom",
+        type=str,
+        help="process all variants that are located on CHROM; whem omitted, process entire file",
+        required=False,
+    )
+
+    parser.add_argument(
         "--output",
         type=argparse.FileType("w"),
         help="output path; when omitted, is generated from PID and timestamp",

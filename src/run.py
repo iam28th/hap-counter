@@ -40,7 +40,14 @@ def run(args: argparse.Namespace):
         chrom = None
         next_read = None
 
-        for variant in vcf:
+        # if CHROM is provided, process only variants on CHROM
+        variant_iterator = None
+        if args.chrom:
+            variant_iterator = vcf.fetch(args.chrom)
+        else:
+            variant_iterator = vcf
+
+        for variant in variant_iterator:
             if not pysam_utils.is_snv(variant):
                 continue
 
@@ -83,11 +90,11 @@ def run(args: argparse.Namespace):
 
 
 def get_variant_support(variant, reads: list[ReadStruct]) -> SNV_Support:
-    vs = SNV_Support(chrom=variant.chrom, pos=variant.start)
-
     # convert everything to upper case (just in case)
     ref_base = variant.ref.upper()
     alt_base = variant.alts[0][0].upper()
+
+    vs = SNV_Support(chrom=variant.chrom, pos=variant.start)
 
     for rs in reads:
         if rs.aligned_pairs is None:
@@ -110,5 +117,8 @@ def get_variant_support(variant, reads: list[ReadStruct]) -> SNV_Support:
             else:
                 vs.h2_REF += read_base == ref_base
                 vs.h2_ALT += read_base == alt_base
+
+    vs.h1_base = ref_base if vs.h1_REF < vs.h1_ALT else alt_base
+    vs.h2_base = ref_base if vs.h2_REF < vs.h2_ALT else alt_base
 
     return vs

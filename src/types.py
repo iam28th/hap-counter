@@ -27,9 +27,21 @@ class SNV_Support:
     h2_REF: int = 0
     h2_ALT: int = 0
 
+    h1_base: str = ""
+    h2_base: str = ""
+
     @staticmethod
     def get_fieldnames() -> list[str]:
-        fns = ["chrom", "pos", "h1_REF", "h1_ALT", "h2_REF", "h2_ALT"]
+        fns = [
+            "chrom",
+            "pos",
+            "h1_REF",
+            "h1_ALT",
+            "h2_REF",
+            "h2_ALT",
+            "h1_base",
+            "h2_base",
+        ]
         # sanity check
         assert all(fn in dir(SNV_Support) for fn in fns)
         return fns
