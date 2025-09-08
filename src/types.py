@@ -1,7 +1,7 @@
 from src.compat import dataclass
 
 
-@dataclass(slots=True)
+@dataclass
 class ReadStruct:
     """
     Used to cache results of expensive calls,
